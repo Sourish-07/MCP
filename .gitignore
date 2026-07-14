@@ -1,0 +1,7 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+logs/*.log
+logs/*.json
+.rh_oauth_cache.json

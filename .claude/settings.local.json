@@ -1,0 +1,45 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__robinhood-trading__get_accounts",
+      "mcp__robinhood-trading__get_portfolio",
+      "mcp__robinhood-trading__search",
+
+      "mcp__robinhood-trading__get_watchlists",
+      "mcp__robinhood-trading__get_watchlist_items",
+      "mcp__robinhood-trading__get_option_watchlist",
+      "mcp__robinhood-trading__get_popular_watchlists",
+      "mcp__robinhood-trading__create_watchlist",
+      "mcp__robinhood-trading__update_watchlist",
+      "mcp__robinhood-trading__follow_list",
+      "mcp__robinhood-trading__unfollow_list",
+      "mcp__robinhood-trading__add_to_watchlist",
+      "mcp__robinhood-trading__remove_from_watchlist",
+      "mcp__robinhood-trading__add_option_to_watchlist",
+      "mcp__robinhood-trading__remove_option_from_watchlist",
+
+      "mcp__robinhood-trading__get_equity_historicals",
+      "mcp__robinhood-trading__get_indexes",
+      "mcp__robinhood-trading__get_indexes_quotes",
+
+      "mcp__robinhood-trading__get_equity_positions",
+      "mcp__robinhood-trading__get_equity_quotes",
+      "mcp__robinhood-trading__get_equity_orders",
+      "mcp__robinhood-trading__get_equity_tradability",
+      "mcp__robinhood-trading__review_equity_order",
+      "mcp__robinhood-trading__place_equity_order",
+      "mcp__robinhood-trading__cancel_equity_order",
+
+      "mcp__robinhood-trading__get_option_chains",
+      "mcp__robinhood-trading__get_option_instruments",
+      "mcp__robinhood-trading__get_option_quotes",
+      "mcp__robinhood-trading__get_option_positions",
+      "mcp__robinhood-trading__get_option_orders",
+      "mcp__robinhood-trading__review_option_order",
+      "mcp__robinhood-trading__place_option_order",
+      "mcp__robinhood-trading__cancel_option_order",
+
+      "mcp__robinhood-trading__get_earnings_calendar"
+    ]
+  }
+}
