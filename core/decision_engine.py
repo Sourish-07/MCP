@@ -31,7 +31,14 @@ Edge (returned as `edge`):
   (NOTE: sector concentration should now be checked using the real sector field
    provided in the FUNDAMENTALS block — this field is sourced directly from
    Robinhood and is a real, populated value, not a placeholder.)
-
+   
+CRITICAL NUMERICAL DISCIPLINE:
+- All percentages and calculations MUST exactly match the numbers in MARKET METRICS.
+- Volume deficit % = ((avg_volume_30d - current_volume) / avg_volume_30d) * 100. Show exact math.
+- Never say "catastrophic -25.7%" if the actual number is -13%. Be precise.
+- drawdown_30d is always positive magnitude. Do not confuse return_30d with drawdown.
+- Only reference metrics that actually exist in the JSON.
+   
 METRIC DEFINITIONS (use these exact definitions, do not infer others):
 - drawdown_30d: the peak-to-trough decline within the last 30 trading
   days ONLY, expressed as a positive percentage magnitude (e.g. 15.5
