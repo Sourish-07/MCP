@@ -35,7 +35,25 @@ class PositionManager:
         if not self._path.exists():
             self._path.write_text("[]", encoding="utf-8")
 
-    def record_entry(self, result: TradeDecision | object, decision: TradeDecision) -> None:
+    @staticmethod
+    def _vol_adjusted_stop_loss(realized_vol_30d: float) -> float:
+        """Widen the stop-loss for higher-volatility names instead of a
+        flat -7% that gets triggered by routine noise on growth stocks.
+        Bands, based on 30-day annualized realized volatility:
+          < 30%  -> -7%  (calm names, tight stop is appropriate)
+          30-60% -> -10% (moderate vol, e.g. AVGO/NEM today)
+          60-90% -> -13% (high vol, e.g. AVGO at 66%)
+          > 90%  -> -16% (extreme vol, e.g. MU historically)
+        """
+        if realized_vol_30d < 30.0:
+            return -0.07
+        if realized_vol_30d < 60.0:
+            return -0.10
+        if realized_vol_30d < 90.0:
+            return -0.13
+        return -0.16
+
+    def record_entry(self, result: TradeDecision | object, decision: TradeDecision, realized_vol_30d: float = 0.0) -> None:
         """Persist a position entry record for executed BUY/ROTATE orders."""
         # This method expects an ExecutionResult-like object for result
         try:
@@ -56,7 +74,7 @@ class PositionManager:
             entry_price=entry_price,
             entry_date=datetime.now(timezone.utc).date().isoformat(),
             entry_edge_score=decision.edge_score if hasattr(decision, "edge_score") else 0.0,
-            stop_loss_pct=-0.07,
+            stop_loss_pct=self._vol_adjusted_stop_loss(realized_vol_30d),
             take_profit_pct=0.20,
             quantity=quantity,
             order_id=getattr(result, "order_id", ""),

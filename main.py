@@ -194,7 +194,7 @@ class TradingAgent:
             except Exception:
                 pass
             if exit_decision.decision == DecisionType.SELL:
-                result = await self.executor.execute(exit_decision, portfolio, current_price, dry_run=self.config["env"]["DRY_RUN"], vol_30d=metrics.get(ticker).realized_vol_30d if metrics.get(ticker) else 0.0, avg_volume_30d=metrics.get(ticker).avg_volume_30d if metrics.get(ticker) else 0.0)
+                result = await self.executor.execute(exit_decision, portfolio, current_price, dry_run=self.config["env"]["DRY_RUN"], vol_30d=metrics.get(ticker).realized_vol_30d if metrics.get(ticker) else 0.0, avg_volume_30d=metrics.get(ticker).avg_volume_30d if metrics.get(ticker) else 0.0, realized_vol_30d=metrics.get(ticker).realized_vol_30d if metrics.get(ticker) else 0.0)
                 if result.status in ("EXECUTED", "WOULD_EXECUTE"):
                     effective_buying_power += signal.quantity * current_price
                     effective_positions_count -= 1
@@ -233,7 +233,7 @@ class TradingAgent:
                 self.journal_manager.append(ticker, entry)
             except Exception:
                 pass
-            result = await self.executor.execute(decision, portfolio, current_price, dry_run=self.config["env"]["DRY_RUN"], vol_30d=metrics.get(ticker).realized_vol_30d if metrics.get(ticker) else 0.0, avg_volume_30d=metrics.get(ticker).avg_volume_30d if metrics.get(ticker) else 0.0)
+            result = await self.executor.execute(decision, portfolio, current_price, dry_run=self.config["env"]["DRY_RUN"], vol_30d=metrics.get(ticker).realized_vol_30d if metrics.get(ticker) else 0.0, avg_volume_30d=metrics.get(ticker).avg_volume_30d if metrics.get(ticker) else 0.0, realized_vol_30d=metrics.get(ticker).realized_vol_30d if metrics.get(ticker) else 0.0)
             if result.status in ("EXECUTED", "WOULD_EXECUTE"):
                 if decision.decision in (DecisionType.BUY, DecisionType.ROTATE):
                     # compute the size used based on the decision's computed edge; execution resolved exact size

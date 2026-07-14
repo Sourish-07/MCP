@@ -66,7 +66,7 @@ class ExecutionEngine:
             return True
         return True
 
-    async def execute(self, decision: TradeDecision, portfolio: Portfolio, current_price: float, dry_run: bool, vol_30d: float = 0.0, avg_volume_30d: float = 0.0) -> ExecutionResult:
+    async def execute(self, decision: TradeDecision, portfolio: Portfolio, current_price: float, dry_run: bool, vol_30d: float = 0.0, avg_volume_30d: float = 0.0, realized_vol_30d: float = 0.0) -> ExecutionResult:
         """Execute or simulate a decision after validating tradeability and risk limits."""
         effective_dry_run = bool(self.settings.get("env", {}).get("DRY_RUN", True)) or bool(dry_run)
         # Block execution during known unsafe time windows
@@ -212,7 +212,7 @@ class ExecutionEngine:
             )
             self._log_trade(decision, result, position_size_pct_local)
             if decision.decision in (DecisionType.BUY, DecisionType.ROTATE):
-                self.position_manager.record_entry(result, decision)
+                self.position_manager.record_entry(result, decision, realized_vol_30d)
             if decision.decision in (DecisionType.SELL, DecisionType.ROTATE):
                 exit_ticker = decision.rotate_from_ticker if decision.decision == DecisionType.ROTATE else decision.ticker
                 self.position_manager.record_exit(exit_ticker)
@@ -239,7 +239,7 @@ class ExecutionEngine:
             self._log_trade(decision, result, position_size_pct_local)
             if result.status == "EXECUTED":
                 if decision.decision in (DecisionType.BUY, DecisionType.ROTATE):
-                    self.position_manager.record_entry(result, decision)
+                    self.position_manager.record_entry(result, decision, realized_vol_30d)
                 if decision.decision in (DecisionType.SELL, DecisionType.ROTATE):
                     exit_ticker = decision.rotate_from_ticker if decision.decision == DecisionType.ROTATE else decision.ticker
                     self.position_manager.record_exit(exit_ticker)

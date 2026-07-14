@@ -32,6 +32,18 @@ Edge (returned as `edge`):
    provided in the FUNDAMENTALS block — this field is sourced directly from
    Robinhood and is a real, populated value, not a placeholder.)
 
+METRIC DEFINITIONS (use these exact definitions, do not infer others):
+- drawdown_30d: the peak-to-trough decline within the last 30 trading
+  days ONLY, expressed as a positive percentage magnitude (e.g. 15.5
+  means a 15.5% decline, never write this as a negative number).
+- return_5d / return_30d / return_90d: signed percentage price change
+  over that many days. These are RETURNS, not drawdowns — a large
+  negative return_90d does NOT mean a "90-day drawdown" exists, since
+  no such field is computed. Only cite drawdown_30d when discussing
+  drawdown, and only for the 30-day window.
+- Do not invent or reference any metric field not explicitly present
+  in the MARKET METRICS JSON block provided in the user prompt.
+
 Rules (non-overridable):
 - Max position size: 8% of portfolio
 - Max open positions: 12
