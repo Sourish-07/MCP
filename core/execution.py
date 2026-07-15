@@ -131,17 +131,7 @@ class ExecutionEngine:
             tradability = await self.client.get_equity_tradability(decision.ticker)
             self.logger.info("TRADABILITY_RESPONSE ticker=%s full=%s", decision.ticker, tradability)
             
-            # Robust parsing for actual MCP structure
-            tradable = False
-            if isinstance(tradability, dict):
-                results = tradability.get("data", {}).get("results", [])
-                if results and isinstance(results, list):
-                    item = results[0] if results else {}
-                    tradable = bool(item.get("tradeable")) or bool(item.get("tradable"))
-                else:
-                    # fallback top-level checks
-                    tradable = bool(tradability.get("tradeable")) or bool(tradability.get("tradable"))
-            
+            tradable = bool(tradability.get("tradeable", False))
             self.logger.info("tradability_check ticker=%s tradable=%s", decision.ticker, tradable)
             
             if not tradable:
@@ -234,8 +224,10 @@ class ExecutionEngine:
 
         try:
             preview = await self.client.review_equity_order(decision.ticker, side, quantity, "market")
-            warnings = str(preview.get("warnings", "") or "").lower()
-            if "insufficient" in warnings or "not allowed" in warnings:
+            order_checks = preview.get("order_checks", {})
+            warnings = str(order_checks).lower() if order_checks else ""
+            if "insufficient" in warnings or "not allowed" in warnings or "halt" in warnings:
+                self.logger.warning("execution_rejected ticker=%s reason=ORDER_CHECK_ALERT order_checks=%s", decision.ticker, order_checks)
                 result = ExecutionResult(ticker=decision.ticker, status="REJECTED", dry_run=effective_dry_run, timestamp=datetime.now(timezone.utc).isoformat(), side=side)
                 self._log_trade(decision, result, position_size_pct_local)
                 return result

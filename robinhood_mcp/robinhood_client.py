@@ -691,14 +691,28 @@ class RobinhoodMCPClient:
         return results_by_ticker
 
     async def get_equity_tradability(self, ticker: str) -> dict[str, Any]:
-        """Fetch tradability metadata for a ticker. Account-scoped."""
+        """Fetch tradability metadata for a ticker. Account-scoped.
+
+        Returns the per-symbol result dict directly (e.g. containing
+        'tradeable', 'state', 'account_type_tradabilities', etc.), not
+        the outer {"data": {"results": [...]}} envelope Robinhood
+        actually returns.
+        """
         account_number = await self._get_account_number()
         args = {"symbols": [ticker]}
         if account_number:
             args["account_number"] = account_number
         content = await self._call_tool_with_retry("get_equity_tradability", args)
         parsed = self._extract_json_payload(content)
-        return parsed if isinstance(parsed, dict) else {}
+
+        if isinstance(parsed, dict):
+            results = parsed.get("data", {}).get("results", [])
+            if isinstance(results, list) and results:
+                for item in results:
+                    if isinstance(item, dict) and item.get("symbol", "").upper() == ticker.upper():
+                        return item
+                return results[0] if isinstance(results[0], dict) else {}
+        return {}
 
     async def _resolve_watchlist_id(self, watchlist_name: str) -> str:
         """Resolve a watchlist's display name to its list_id UUID."""
@@ -904,7 +918,7 @@ class RobinhoodMCPClient:
             args["account_number"] = account_number
         content = await self._call_tool_with_retry("review_equity_order", args)
         parsed = self._extract_json_payload(content)
-        return parsed if isinstance(parsed, dict) else {}
+        return parsed.get("data", {}) if isinstance(parsed, dict) else {}
 
     async def place_equity_order(
         self,
