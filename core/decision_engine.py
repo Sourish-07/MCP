@@ -89,6 +89,10 @@ CRITICAL NUMERICAL DISCIPLINE (unchanged, still mandatory)
 METRIC DEFINITIONS (use these exact definitions, do not infer others)
 - drawdown_30d: peak-to-trough decline within the last 30 trading days
   ONLY, always a positive magnitude. Never write this as negative.
+  When citing this value in prose, always say "30-day drawdown" — never
+  attach any other day-count (e.g. "90-day drawdown") to this number,
+  since no drawdown metric other than the 30-day window is computed
+  or provided anywhere in this system.
 - return_5d / return_30d / return_90d: signed percentage price change
   over that many days. These are RETURNS, not drawdowns. A negative
   return_90d does not imply any "90-day drawdown" field exists — it

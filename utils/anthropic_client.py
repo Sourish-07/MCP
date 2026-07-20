@@ -30,13 +30,16 @@ class AnthropicClient:
         last_error: Exception | None = None
         for attempt in range(1, 4):
             try:
-                response = await self.client.messages.create(
-                    model=self.model,
-                    max_tokens=self.max_tokens,
-                    temperature=self.temperature,
-                    system=system,
-                    messages=[{"role": "user", "content": user}],
-                )
+                request_kwargs = {
+                    "model": self.model,
+                    "max_tokens": self.max_tokens,
+                    "system": system,
+                    "messages": [{"role": "user", "content": user}],
+                }
+                # Newer model generations reject the temperature parameter entirely
+                if not self.model.startswith("claude-sonnet-5") and not self.model.startswith("claude-opus-4-8"):
+                    request_kwargs["temperature"] = self.temperature
+                response = await self.client.messages.create(**request_kwargs)
                 text = "".join(
                     block.text for block in getattr(response, "content", []) if getattr(block, "type", "") == "text"
                 )

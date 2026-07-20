@@ -28,7 +28,12 @@
       "NVDA",
       "AVGO",
       "GOOGL",
-      "MU"
+      "MU",
+      "TSM",
+      "META",
+      "MSFT",
+      "AMD",
+      "ARM"
     ],
     "robinhood_watchlist_name": "Default"
   },

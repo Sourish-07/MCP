@@ -44,7 +44,7 @@ class TradingAgent:
         self.journal_manager = JournalManager()
         self.earnings_calendar = EarningsCalendar()
         self.earnings_calendar.set_client(self.mcp_client)
-        self.decision_engine = DecisionEngine(AnthropicClient(model="claude-sonnet-4-5"), self.journal_manager, self.earnings_calendar)
+        self.decision_engine = DecisionEngine(AnthropicClient(model="claude-sonnet-5"), self.journal_manager, self.earnings_calendar)
         self.position_manager = PositionManager()
         self.pnl_tracker = PnLTracker(self.mcp_client)
         self.executor = ExecutionEngine(self.mcp_client, self.position_manager, self.config)

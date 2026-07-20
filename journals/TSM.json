@@ -1,0 +1,82 @@
+[
+  {
+    "timestamp": "2026-07-20T13:37:18.725167+00:00",
+    "cycle_type": "OPEN",
+    "bull_thesis": "No dated, forward-looking catalyst is present. The headline is purely descriptive geopolitical background (Taiwan concentration risk, US-China tensions) with no specific event, earnings date, or regulatory decision cited that would trigger a move higher in the next 1-2 weeks. For price to be meaningfully higher, we'd need a de-escalation headline or a scheduled event (e.g., earnings, guidance update) that isn't identified here \u2014 this is not evident in the data provided, so any upside case right now is speculative rather than catalyst-driven.",
+    "bear_thesis": "The stock is in an active downtrend (macd_histogram -5.80, deeply negative) with return_5d -8.23% and return_30d -8.78%, a 30-day drawdown of 16.58%, and price -8.92% below the 20dma. If macd_histogram continues to deteriorate or price closes below recent lows on continued volume expansion (volume_spike_pct +30.67% already elevated), the downtrend is confirmed rather than reversing, invalidating any near-term bounce thesis.",
+    "decision": "IGNORE",
+    "decision_rationale": "TSM's single news item is generic descriptive risk commentary with no dated catalyst, capping catalyst_strength well below threshold per methodology. Technical picture shows an active downtrend (macd_histogram -5.80, rsi 39.3, price -8.92% below 20dma, 30d drawdown 16.58%) rather than a clear reversal or basing pattern, so technical_confirmation is modest. Combined edge total is well under the 3.5 minimum required to open a new position; recommend IGNORE with no action this cycle.",
+    "key_metrics": {
+      "ticker": "TSM",
+      "current_price": 398.37,
+      "return_5d": -8.232936352537378,
+      "return_30d": -8.775103620417228,
+      "return_90d": 8.229189306672469,
+      "drawdown_30d": 16.583956278660715,
+      "closes_above_20dma": 9,
+      "distance_from_20dma": -8.916727065704297,
+      "avg_volume_7d": 15164765.909745,
+      "avg_volume_30d": 16060425.8373,
+      "volume_spike_pct": 30.67190255478394,
+      "atr_7d": 18.783086124045344,
+      "realized_vol_7d": 20.538555702117044,
+      "realized_vol_30d": 57.208345652606226,
+      "rsi_14": 39.25317353256341,
+      "bb_zscore": -1.6000751368534842,
+      "macd_histogram": -5.800403441703953,
+      "market_cap": 2123085588000.0,
+      "pe_ratio": 29.571732,
+      "dividend_yield": 0.673986,
+      "sector": "Electronic Technology",
+      "industry": "Semiconductors",
+      "window_start": "2026-04-21T00:00:00Z",
+      "window_end": "2026-07-17T00:00:00Z"
+    },
+    "news_used": [
+      "Taiwan Semiconductor Manufacturing Company (TSM) is facing significant geopolitical risk as the leading foundry for advanced chip production, with ongoing U.S.-China tensions and potential Taiwan strait instability creating uncertainty around its largest customer base and operational continuity. TSM's 3nm and advanced node capacity remains heavily concentrated in Taiwan, making it vulnerable to supply chain disruption despite recent efforts to diversify manufacturing to Arizona and Japan."
+    ],
+    "fill_price": null,
+    "unrealized_pnl_pct": null,
+    "earnings_flag": false
+  },
+  {
+    "timestamp": "2026-07-20T16:33:57.918406+00:00",
+    "cycle_type": "MID",
+    "bull_thesis": "No specific dated catalyst exists in the next 1-2 weeks; the news is generic geopolitical/AI-demand commentary already known to the market. Price remains in an active downtrend (-8.92% below 20dma, macd_histogram -5.80, rsi 39.3). A bull case would require rsi basing and macd inflection to turn positive, neither of which has happened yet. This event has not occurred, so there is no valid forward trigger to expect higher prices in 1-2 weeks.",
+    "bear_thesis": "Continued downtrend confirmation: further deterioration in macd_histogram, rsi_14 dropping toward oversold without reversal, and drawdown_30d extending beyond 16.58% would invalidate any near-term bounce thesis and signal further downside.",
+    "decision": "IGNORE",
+    "decision_rationale": "TSM's single news item remains generic descriptive risk/demand commentary with no dated forward catalyst, capping catalyst_strength at 0.3. Technical picture is still an active downtrend (rsi 39.3, macd -5.80, -8.92% below 20dma, 30d drawdown 16.58%) with no confirmed basing pattern, limiting technical_confirmation to 0.5. Portfolio has zero positions so fit is neutral at 0.5. Total edge ~1.3, far below 3.5 threshold. Consistent with prior journal IGNORE; no change in thesis warranted this MID cycle. Recommend continued IGNORE with no action.",
+    "key_metrics": {
+      "ticker": "TSM",
+      "current_price": 398.37,
+      "return_5d": -8.232936352537378,
+      "return_30d": -8.775103620417228,
+      "return_90d": 8.229189306672469,
+      "drawdown_30d": 16.583956278660715,
+      "closes_above_20dma": 9,
+      "distance_from_20dma": -8.916727065704297,
+      "avg_volume_7d": 15164765.909745,
+      "avg_volume_30d": 16060425.8373,
+      "volume_spike_pct": 30.67190255478394,
+      "atr_7d": 18.783086124045344,
+      "realized_vol_7d": 20.538555702117044,
+      "realized_vol_30d": 57.208345652606226,
+      "rsi_14": 39.25317353256341,
+      "bb_zscore": -1.6000751368534842,
+      "macd_histogram": -5.800403441703953,
+      "market_cap": 2106696311200.0,
+      "pe_ratio": 29.571732,
+      "dividend_yield": 0.673986,
+      "sector": "Electronic Technology",
+      "industry": "Semiconductors",
+      "window_start": "2026-04-21T00:00:00Z",
+      "window_end": "2026-07-17T00:00:00Z"
+    },
+    "news_used": [
+      "Taiwan Semiconductor Manufacturing Company (TSM) is facing significant geopolitical risk as the leading foundry for advanced chips, with U.S.-China tensions creating uncertainty around its ability to serve Chinese customers and potential restrictions on its most advanced 3nm and below processes. TSM's financial performance in mid-2026 is heavily dependent on AI chip demand from major customers like NVIDIA and AMD, which has driven capacity utilization and pricing power but also creates concentration risk if AI spending moderates."
+    ],
+    "fill_price": null,
+    "unrealized_pnl_pct": null,
+    "earnings_flag": false
+  }
+]

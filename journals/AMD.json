@@ -1,0 +1,82 @@
+[
+  {
+    "timestamp": "2026-07-20T13:36:33.751252+00:00",
+    "cycle_type": "OPEN",
+    "bull_thesis": "News cited (Xilinx integration, EPYC share gains) is old, descriptive background with no dated forward trigger in the next 1-2 weeks - the Xilinx deal closed in Feb 2024 and is fully priced in. There is no specific upcoming catalyst (earnings date, product launch, contract) identified in the provided news. The only potential forward argument is technical: RSI at 46.1 (neutral, not yet oversold-reversal), bb_zscore -1.4 (stretched but not extreme), and price still -6.99% below the 20dma with macd_histogram deeply negative at -7.93, meaning downward momentum has not yet reversed. This is not a validated bull setup, only a possible early-stage stabilization that remains unconfirmed.",
+    "bear_thesis": "Momentum remains negative: return_5d -11.14%, return_30d -8.62%, drawdown_30d 22.12%, and macd_histogram -7.93 (deeply negative, no reversal yet). Closes_above_20dma only 15 and distance_from_20dma -6.99% show price still below trend. If RSI fails to recover from 46 and price makes a new low below recent support, the thesis is invalidated and further downside to test 30d lows is likely.",
+    "decision": "IGNORE",
+    "decision_rationale": "AMD's cited news is descriptive/stale (Xilinx deal closed in 2024) with no dated forward trigger in the next 1-2 weeks, capping catalyst_strength at 0.3. Technicals are mixed: RSI neutral at 46.1, bb_zscore -1.40 (moderately stretched but not extreme), macd_histogram deeply negative at -7.93 indicating active downtrend, and price still -6.99% below the 20dma with only 15 closes above it. This does not qualify as an early-basing reversal signal. Edge total (~1.6) is far below the 3.5 threshold; recommend IGNORE, no new position opened this cycle.",
+    "key_metrics": {
+      "ticker": "AMD",
+      "current_price": 495.76,
+      "return_5d": -11.136603990033878,
+      "return_30d": -8.61903708619037,
+      "return_90d": 74.26271573693275,
+      "drawdown_30d": 22.122187602210325,
+      "closes_above_20dma": 15,
+      "distance_from_20dma": -6.990138714632393,
+      "avg_volume_7d": 26241935.560923,
+      "avg_volume_30d": 29324450.0745,
+      "volume_spike_pct": 9.519104086890868,
+      "atr_7d": 39.41719465269235,
+      "realized_vol_7d": 64.83469642118682,
+      "realized_vol_30d": 82.15218405139943,
+      "rsi_14": 46.13522826142568,
+      "bb_zscore": -1.4019534810943721,
+      "macd_histogram": -7.930406296953537,
+      "market_cap": 842580244877.4204,
+      "pe_ratio": 164.409728,
+      "dividend_yield": 0.0,
+      "sector": "Electronic Technology",
+      "industry": "Semiconductors",
+      "window_start": "2026-04-21T00:00:00Z",
+      "window_end": "2026-07-17T00:00:00Z"
+    },
+    "news_used": [
+      "AMD is facing significant competitive pressure in the data center GPU market from NVIDIA's continued dominance and newer entrants, while its EPYC CPU business remains a strong revenue driver with solid market share gains against Intel. The company's acquisition of Xilinx for $49 billion closed in February 2024, integrating adaptive computing capabilities that are critical for AI and edge computing applications, though integration execution and return on investment remain key investor focus areas."
+    ],
+    "fill_price": null,
+    "unrealized_pnl_pct": null,
+    "earnings_flag": false
+  },
+  {
+    "timestamp": "2026-07-20T16:33:25.568656+00:00",
+    "cycle_type": "MID",
+    "bull_thesis": "No specific dated catalyst exists in the next 1-2 weeks. The Xilinx acquisition closed in Feb 2024 and is fully priced in, purely descriptive background. Price is -6.99% below the 20dma with macd_histogram deeply negative at -7.93, indicating an active downtrend, not a basing pattern. There is no unresolved event to trigger a higher price in 1-2 weeks; this thesis is not actionable long.",
+    "bear_thesis": "Continued deterioration is likely: return_5d is -11.14%, return_30d is -8.62%, drawdown_30d is 22.12%, and macd_histogram remains deeply negative at -7.93, signaling active downtrend rather than reversal. If price fails to reclaim the 20dma (currently -6.99% below) with volume_spike_pct only 9.52% (no strong accumulation), the downtrend likely persists or accelerates.",
+    "decision": "IGNORE",
+    "decision_rationale": "Consistent with prior journal entry: no new catalyst has emerged since last review. News is stale/descriptive (Xilinx deal closed 2024). Technicals remain weak-to-mixed: RSI neutral-low at 46.1, bb_zscore -1.40 (moderate stretch, not extreme oversold), macd_histogram deeply negative at -7.93 confirming active downtrend, not early basing. Volume spike of only 9.52% shows no strong reversal signal. Edge total well below 3.5 threshold; MID cycle requires higher bar for new entries. Recommend IGNORE, no position opened.",
+    "key_metrics": {
+      "ticker": "AMD",
+      "current_price": 495.76,
+      "return_5d": -11.136603990033878,
+      "return_30d": -8.61903708619037,
+      "return_90d": 74.26271573693275,
+      "drawdown_30d": 22.122187602210325,
+      "closes_above_20dma": 15,
+      "distance_from_20dma": -6.990138714632393,
+      "avg_volume_7d": 26241935.560923,
+      "avg_volume_30d": 29324450.0745,
+      "volume_spike_pct": 9.519104086890868,
+      "atr_7d": 39.41719465269235,
+      "realized_vol_7d": 64.83469642118682,
+      "realized_vol_30d": 82.15218405139943,
+      "rsi_14": 46.13522826142568,
+      "bb_zscore": -1.4019534810943721,
+      "macd_histogram": -7.930406296953537,
+      "market_cap": 837052508864.1554,
+      "pe_ratio": 164.409728,
+      "dividend_yield": 0.0,
+      "sector": "Electronic Technology",
+      "industry": "Semiconductors",
+      "window_start": "2026-04-21T00:00:00Z",
+      "window_end": "2026-07-17T00:00:00Z"
+    },
+    "news_used": [
+      "AMD is facing intense competition in the data center GPU market from NVIDIA's dominant position, while its EPYC server CPUs maintain strong market share in cloud infrastructure deployments. The company's acquisition of Xilinx for $49 billion closed in February 2024, significantly expanding its adaptive computing and edge AI capabilities, though integration execution and return on investment remain key investor focus areas."
+    ],
+    "fill_price": null,
+    "unrealized_pnl_pct": null,
+    "earnings_flag": false
+  }
+]

@@ -1,0 +1,83 @@
+[
+  {
+    "timestamp": "2026-07-20T13:36:20.421031+00:00",
+    "cycle_type": "OPEN",
+    "bull_thesis": "No specific dated catalyst is identified in the news\u2014both headlines are generic descriptions of ARM's licensing business model and AI leverage, not forward triggers like an earnings date, contract announcement, or product launch. For price to be meaningfully higher in 1-2 weeks, the stock would need to stabilize and reverse a steep decline (return_30d -35.12%, drawdown_30d 40.38%) without any identified news catalyst driving that reversal\u2014this is not yet visible in the technicals.",
+    "bear_thesis": "macd_histogram is deeply negative (-10.28), indicating an active downtrend, not a reversal. rsi_14 at 38.24 is below neutral but not in classic oversold-bounce territory (<30), and bb_zscore of -1.04 is not statistically stretched (would need <-2 for a strong mean-reversion setup). If the downtrend continues with no basing (further closes below 20dma, closes_above_20dma is already just 2), the stock likely grinds lower or stays range-bound rather than rallying.",
+    "decision": "IGNORE",
+    "decision_rationale": "News is purely descriptive background on ARM's licensing model and AI exposure with no dated forward catalyst, so catalyst_strength is capped low per policy. Technicals show an active downtrend (macd_histogram -10.28, distance_from_20dma -18.61%) rather than confirmed basing\u2014rsi_14 at 38.24 and bb_zscore -1.04 are not extreme enough to signal a high-confidence reversal. Combined edge is well below the 3.5 threshold; IGNORE is appropriate, no position opened.",
+    "key_metrics": {
+      "ticker": "ARM",
+      "current_price": 267.19,
+      "return_5d": -17.37839760042054,
+      "return_30d": -35.121287910059976,
+      "return_90d": 52.253689668926995,
+      "drawdown_30d": 40.379101624721244,
+      "closes_above_20dma": 2,
+      "distance_from_20dma": -18.614940139230892,
+      "avg_volume_7d": 6608438.313004,
+      "avg_volume_30d": 8643044.91693,
+      "volume_spike_pct": -4.674266081142841,
+      "atr_7d": 28.593712108452515,
+      "realized_vol_7d": 91.28770775495146,
+      "realized_vol_30d": 99.39532469950414,
+      "rsi_14": 38.2372969623171,
+      "bb_zscore": -1.0386078680487318,
+      "macd_histogram": -10.278085950719408,
+      "market_cap": 290211330817.1338,
+      "pe_ratio": 309.558129,
+      "dividend_yield": 0.0,
+      "sector": "Electronic Technology",
+      "industry": "Semiconductors",
+      "window_start": "2026-04-21T00:00:00Z",
+      "window_end": "2026-07-17T00:00:00Z"
+    },
+    "news_used": [
+      "Arm Holdings has been a critical beneficiary of the AI chip design boom, with its CPU and GPU architectures powering the majority of mobile processors and increasingly competing in data center and automotive applications where AI inference is expanding rapidly. The company's licensing business model provides recurring revenue streams from major chip manufacturers like Qualcomm, MediaTek, and Apple, giving it significant leverage to AI infrastructure growth without direct manufacturing exposure.",
+      "Arm's recent financial performance has been driven by strong royalty growth from 5G and AI-related chip shipments, though the company faces ongoing geopolitical risks around its ability to license to Chinese customers and potential regulatory scrutiny given its position as a critical chokepoint in semiconductor design for global technology companies."
+    ],
+    "fill_price": null,
+    "unrealized_pnl_pct": null,
+    "earnings_flag": false
+  },
+  {
+    "timestamp": "2026-07-20T16:33:15.397286+00:00",
+    "cycle_type": "MID",
+    "bull_thesis": "No dated forward catalyst is present; the news is purely descriptive background on ARM's licensing model and AI exposure, already known for weeks. Price is in an active downtrend (return_5d -17.38%, return_30d -35.12%, distance_from_20dma -18.61%) with no confirmed reversal signal. There is no specific event in the next 1-2 weeks that would drive shares meaningfully higher; this is a falling knife, not an early-basing setup.",
+    "bear_thesis": "Continued deterioration is the base case: macd_histogram remains deeply negative (-10.28) signaling active downtrend momentum, rsi_14 at 38.24 is not yet oversold enough to suggest exhaustion, and bb_zscore -1.04 is not statistically stretched. closes_above_20dma of 2 confirms persistent weakness below the moving average. Any further deceleration in AI/data-center licensing commentary or customer concentration risk (NVIDIA/Qualcomm/MediaTek dependency) could extend the decline.",
+    "decision": "IGNORE",
+    "decision_rationale": "News is descriptive background only, capping catalyst_strength well below threshold. Technicals confirm an active downtrend (macd_histogram -10.28, distance_from_20dma -18.61%, return_30d -35.12%) without oversold extremity (rsi_14 38.24, bb_zscore -1.04) that would signal a high-confidence reversal. Combined edge total is far below 3.5. IGNORE is appropriate; no position opened, consistent with prior journal entry and unchanged conditions.",
+    "key_metrics": {
+      "ticker": "ARM",
+      "current_price": 267.19,
+      "return_5d": -17.37839760042054,
+      "return_30d": -35.121287910059976,
+      "return_90d": 52.253689668926995,
+      "drawdown_30d": 40.379101624721244,
+      "closes_above_20dma": 2,
+      "distance_from_20dma": -18.614940139230892,
+      "avg_volume_7d": 6608438.313004,
+      "avg_volume_30d": 8643044.91693,
+      "volume_spike_pct": -4.674266081142841,
+      "atr_7d": 28.593712108452515,
+      "realized_vol_7d": 91.28770775495146,
+      "realized_vol_30d": 99.39532469950414,
+      "rsi_14": 38.2372969623171,
+      "bb_zscore": -1.0386078680487318,
+      "macd_histogram": -10.278085950719408,
+      "market_cap": 290823229057.7028,
+      "pe_ratio": 309.558129,
+      "dividend_yield": 0.0,
+      "sector": "Electronic Technology",
+      "industry": "Semiconductors",
+      "window_start": "2026-04-21T00:00:00Z",
+      "window_end": "2026-07-17T00:00:00Z"
+    },
+    "news_used": [
+      "Arm Holdings has been experiencing significant revenue growth driven by increased adoption of its CPU and GPU IP licensing across AI accelerators and data center applications, with major customers like NVIDIA, Qualcomm, and MediaTek expanding their use of Arm-based architectures. The company's financial performance has been supported by higher royalty rates and increased unit shipments in mobile and edge AI devices, though it remains dependent on a concentrated customer base for a substantial portion of its licensing revenue."
+    ],
+    "fill_price": null,
+    "unrealized_pnl_pct": null,
+    "earnings_flag": false
+  }
+]

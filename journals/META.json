@@ -1,0 +1,83 @@
+[
+  {
+    "timestamp": "2026-07-20T13:37:01.366783+00:00",
+    "cycle_type": "OPEN",
+    "bull_thesis": "The only cited catalyst is Meta's already-guided 2026 capex increase and Reels' now-mature ad contribution \u2014 both are descriptive/background facts about ongoing trends, not a specific dated event still ahead in the next 1-2 weeks (no earnings date, product launch, or regulatory decision cited). There is no unresolved forward trigger identified that would push price meaningfully higher in this window; the capex guidance and Reels maturation have already been public/priced narratives for some time.",
+    "bear_thesis": "If no new catalyst emerges before next earnings and price simply drifts with broader tech/SPY weakness (SPY 5d -1.54%, 30d -1.45%), META likely trades sideways-to-down; a break below the 20dma with RSI rolling under 50 would confirm the pullback (return_5d already -3.47%) is continuing rather than reversing.",
+    "decision": "IGNORE",
+    "decision_rationale": "No specific, unresolved, dated catalyst exists in the provided news \u2014 both cited items (capex guidance, Reels maturity) describe ongoing/already-known trends rather than a near-term trigger. Technical picture is neutral-to-mixed (RSI 57, bb_zscore 0.52, recent 5d pullback of -3.47%) and does not show a compelling early-reversal or breakout setup. Combined edge score of 2.3 falls short of the 3.5 threshold required to open a new position; recommend IGNORE this cycle.",
+    "key_metrics": {
+      "ticker": "META",
+      "current_price": 646.01,
+      "return_5d": -3.4667742562125556,
+      "return_30d": 3.6967478891778183,
+      "return_90d": -3.4133724059565878,
+      "drawdown_30d": 20.319678266868234,
+      "closes_above_20dma": 12,
+      "distance_from_20dma": 6.733790056563009,
+      "avg_volume_7d": 21070613.624831,
+      "avg_volume_30d": 20912441.0772,
+      "volume_spike_pct": 6.481409405034796,
+      "atr_7d": 29.012268257856476,
+      "realized_vol_7d": 57.00586243354707,
+      "realized_vol_30d": 52.64634326796692,
+      "rsi_14": 57.010021919770914,
+      "bb_zscore": 0.5156228073628122,
+      "macd_histogram": 8.257336574968374,
+      "market_cap": 1624098744835.38,
+      "pe_ratio": 24.159293,
+      "dividend_yield": 0.316008,
+      "sector": "Technology Services",
+      "industry": "Internet Software/Services",
+      "window_start": "2026-04-21T00:00:00Z",
+      "window_end": "2026-07-17T00:00:00Z"
+    },
+    "news_used": [
+      "Meta Spending to Soar on AI, Massive Data Center",
+      "Meta's AI infrastructure investments, particularly in training large language models and expanding data center capacity, continue to drive significant capital expenditure growth, with the company guiding for substantially higher capex in 2026 compared to 2025. The company's Reels advertising business has matured as a meaningful revenue contributor across Facebook and Instagram, now representing a substantial portion of ad revenue growth and helping offset legacy feed ad saturation concerns."
+    ],
+    "fill_price": null,
+    "unrealized_pnl_pct": null,
+    "earnings_flag": false
+  },
+  {
+    "timestamp": "2026-07-20T16:33:47.086690+00:00",
+    "cycle_type": "MID",
+    "bull_thesis": "No specific, dated, near-term catalyst is identified in the news \u2014 the cited items (Apple privacy headwinds, TikTok competition, AI/capex investment) are ongoing, well-known dynamics, not a forward trigger with a specific date. Nothing suggests a reason for price to move meaningfully higher in the next 1-2 weeks beyond generic momentum; this thesis is not valid as a forward catalyst.",
+    "bear_thesis": "Continued ad-revenue pressure from Apple privacy changes and TikTok competition, combined with a 5d return of -3.47% and elevated realized volatility (57.0% 7d), could extend the pullback; a break below the 20dma distance cushion would confirm downside continuation.",
+    "decision": "IGNORE",
+    "decision_rationale": "Same conclusion as prior journal entry: no unresolved, dated catalyst exists, and technicals remain neutral-to-mixed (RSI 57.0, bb_zscore 0.52, negative 5d return of -3.47% despite positive MACD histogram). Edge total (~1.6) falls well short of 3.5 threshold. No position exists, no portfolio pressure to act. Recommend IGNORE.",
+    "key_metrics": {
+      "ticker": "META",
+      "current_price": 646.01,
+      "return_5d": -3.4667742562125556,
+      "return_30d": 3.6967478891778183,
+      "return_90d": -3.4133724059565878,
+      "drawdown_30d": 20.319678266868234,
+      "closes_above_20dma": 12,
+      "distance_from_20dma": 6.733790056563009,
+      "avg_volume_7d": 21070613.624831,
+      "avg_volume_30d": 20912441.0772,
+      "volume_spike_pct": 6.481409405034796,
+      "atr_7d": 29.012268257856476,
+      "realized_vol_7d": 57.00586243354707,
+      "realized_vol_30d": 52.64634326796692,
+      "rsi_14": 57.010021919770914,
+      "bb_zscore": 0.5156228073628122,
+      "macd_histogram": 8.257336574968374,
+      "market_cap": 1655105639386.32,
+      "pe_ratio": 24.159293,
+      "dividend_yield": 0.316008,
+      "sector": "Technology Services",
+      "industry": "Internet Software/Services",
+      "window_start": "2026-04-21T00:00:00Z",
+      "window_end": "2026-07-17T00:00:00Z"
+    },
+    "news_used": [
+      "Meta's advertising business faces headwinds from Apple's privacy changes and increased competition from TikTok, which has pressured its core revenue growth despite strong AI infrastructure investments. The company has been aggressively expanding its data center capacity and AI chip development to support both its metaverse ambitions and to compete in the generative AI market, representing a significant capital allocation shift from its traditional advertising focus."
+    ],
+    "fill_price": null,
+    "unrealized_pnl_pct": null,
+    "earnings_flag": false
+  }
+]
