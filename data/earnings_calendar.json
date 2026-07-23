@@ -1,5 +1,5 @@
 {
-  "refreshed_at": "2026-07-20T13:35:17.579767+00:00",
+  "refreshed_at": "2026-07-22T13:35:11.612898+00:00",
   "source": "robinhood_mcp_direct",
   "entries": [
     {
@@ -40,6 +40,14 @@
       "time": "AMC",
       "verified": true,
       "eps_estimate": "7.180000",
+      "eps_actual": null
+    },
+    {
+      "ticker": "AMD",
+      "date": "2026-08-04",
+      "time": "AMC",
+      "verified": true,
+      "eps_estimate": "1.550000",
       "eps_actual": null
     }
   ]

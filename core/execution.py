@@ -135,12 +135,14 @@ class ExecutionEngine:
             self.logger.info("tradability_check ticker=%s tradable=%s", decision.ticker, tradable)
             
             if not tradable:
-                return ExecutionResult(
+                result = ExecutionResult(
                     ticker=decision.ticker, 
                     status="REJECTED_NOT_TRADABLE", 
                     dry_run=effective_dry_run, 
                     timestamp=datetime.now(timezone.utc).isoformat()
                 )
+                self._log_trade(decision, result, 0.0)
+                return result
         except Exception as exc:
             self.logger.error("tradability_check_failed ticker=%s error=%s", decision.ticker, exc)
             # Allow trade in OPEN cycle when data is available but check fails
@@ -252,7 +254,9 @@ class ExecutionEngine:
             return result
         except Exception as exc:
             self.logger.warning("execution_failed ticker=%s error=%s", decision.ticker, exc)
-            return ExecutionResult(ticker=decision.ticker, status="REJECTED_EXCEPTION", dry_run=effective_dry_run, timestamp=datetime.now(timezone.utc).isoformat(), side=side)
+            result = ExecutionResult(ticker=decision.ticker, status="REJECTED_EXCEPTION", dry_run=effective_dry_run, timestamp=datetime.now(timezone.utc).isoformat(), side=side)
+            self._log_trade(decision, result, 0.0)
+            return result
 
     def _log_trade(self, decision: TradeDecision, result: ExecutionResult, position_size_pct: float) -> None:
         """Append a trade result to logs/trades.json."""

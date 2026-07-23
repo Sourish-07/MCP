@@ -145,6 +145,32 @@ class TradingAgent:
                 metrics[ticker] = MarketMetrics(ticker=ticker)
             else:
                 metrics[ticker] = result
+
+        # Stale current_price bug fix: overwrite each ticker's
+        # MarketMetrics.current_price with the live quote price after metrics
+        # are computed, and recompute distance_from_20dma using that corrected
+        # live price. metrics.py derives both fields from the last daily
+        # historicals bar, which does not change within a single trading day;
+        # the live quote does. RSI, MACD, bb_zscore, and other technical
+        # indicators are intentionally left as-is (they are correctly computed
+        # from completed daily bars by design). Only current_price and its
+        # dependent distance_from_20dma need correcting here, using data
+        # main.py already has on hand. This runs for every ticker in the
+        # metrics dict (including SPY if present) before any decision,
+        # review_exit, or journal entry is produced, so both Claude's prompt
+        # and the saved journal reflect the corrected live price.
+        for ticker, m in metrics.items():
+            quote = quotes.get(ticker)
+            if quote and quote.price > 0 and m.current_price > 0:
+                # Recompute distance_from_20dma using the LIVE price, not the
+                # stale daily-bar close, since sma_20 itself only needs to be
+                # derived once (it's already correctly averaged from daily
+                # bars) but "distance from it" must reflect where price
+                # actually is right now, not the last completed daily candle.
+                sma_20 = m.current_price - (m.current_price * m.distance_from_20dma / 100.0)
+                m.current_price = quote.price
+                if sma_20 != 0:
+                    m.distance_from_20dma = ((quote.price - sma_20) / sma_20) * 100.0
         spy_m = metrics.get("SPY")
         if spy_m and spy_m.current_price > 0:
             spy_context = (
