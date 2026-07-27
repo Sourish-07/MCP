@@ -80,38 +80,80 @@ class JournalManager:
             self.logger.warning("journal_list_failed: %s", exc)
             return []
 
-    def summarise_for_prompt(self, ticker: str, n: int = 6) -> str:
-        """Return a human-readable summary of the last n journal entries for prompt injection.
+    def summarise_for_prompt(self, ticker: str, n: int = 15) -> str:
+        """Return a PRICE-AND-METRICS-ONLY summary of recent journal entries for prompt injection.
+
+        Past DECISIONS (IGNORE/BUY/HOLD/SELL) and their rationales are
+        intentionally NOT shown — the model is not allowed to anchor on its
+        own prior verdicts.  Only historical price and technical metric
+        fields are included so the model can understand how the stock has
+        actually moved over time without being biased by what previous
+        cycles decided.
+
+        With n=15 (the default), up to ~5 trading days of multi-cycle
+        snapshots are shown (OPEN/MID/CLOSE), giving the model a real
+        trajectory to read rather than a 2-3 session fragment.
 
         Example output:
-        --- Journal: TICKER (last N entries) ---
-        [2024-06-15 09:35 OPEN] Decision: BUY | catalyst_strength=2.0 | Rationale: ...
-        [2024-06-15 12:30 MID]  Decision: HOLD | technical_confirmation=1.5 | Rationale: ...
-        --- end journal ---
+        --- Historical PRICE/METRIC trajectory for TICKER (oldest→newest, last 15 sessions with price data; DECISIONS deliberately omitted) ---
+        [2026-07-14 13:36 OPEN] price=203.53 | rsi=49.9 | macd_hist=1.21 | bb_zscore=0.12 | ret5d=+4.08% | ret30d=-5.00% | ret90d=+10.99% | dd30d=14.19% | vol_spike=-17.27% | vol30d=44.3 | vs20dma=+0.82%
+        --- end metrics ---
         """
         entries = self.get_recent(ticker, n)
         if not entries:
-            return f"No prior journal entries for {ticker}."
+            return f"No prior price/metric data for {ticker}."
 
-        lines = [f"--- Journal: {ticker} (last {len(entries)} entries) ---"]
-        for entry in entries:
+        # Filter to entries that have actual price data (current_price > 0).
+        # Zero-price entries are data-outage sessions; skip them so the
+        # trajectory is not polluted with phantom $0 points.
+        valid = [e for e in entries if isinstance(e.key_metrics, dict) and float(e.key_metrics.get("current_price", 0.0)) > 0.0]
+
+        shown = min(len(valid), n)
+        if not valid:
+            return f"No price/metric data available for {ticker} (all recent sessions had price=0)."
+
+        lines = [f"--- Historical PRICE/METRIC trajectory for {ticker} (oldest→newest, last {shown} sessions with price data; DECISIONS deliberately omitted) ---"]
+
+        # Safe numeric formatters — coerce None/missing to 0 so the
+        # method never crashes on a bare :.2f format spec.
+        def _num(v, spec: str = ".2f") -> str:
+            try:
+                return format(float(v if v is not None else 0.0), spec)
+            except Exception:
+                return "—"
+
+        def _pct(v) -> str:
+            try:
+                return f"{float(v if v is not None else 0.0):+.2f}%"
+            except Exception:
+                return "—"
+
+        for entry in valid[-n:]:
             try:
                 try:
                     dt = datetime.fromisoformat(entry.timestamp)
                     timestr = dt.strftime("%Y-%m-%d %H:%M")
                 except Exception:
                     timestr = entry.timestamp
-                catalyst = entry.key_metrics.get("edge_catalyst") if isinstance(entry.key_metrics, dict) else None
-                technical = entry.key_metrics.get("edge_technical") if isinstance(entry.key_metrics, dict) else None
-                parts = [f"[{timestr} {entry.cycle_type}] Decision: {entry.decision}"]
-                if catalyst is not None:
-                    parts.append(f"catalyst_strength={catalyst}")
-                if technical is not None:
-                    parts.append(f"technical_confirmation={technical}")
-                parts.append(f"Rationale: {entry.decision_rationale}")
-                lines.append(" | ".join(parts))
+                km = entry.key_metrics if isinstance(entry.key_metrics, dict) else {}
+                price_str = _num(km.get("current_price"), ".2f") if km.get("current_price") else "—"
+                line = (
+                    f"[{timestr} {entry.cycle_type}] "
+                    f"price={price_str} | "
+                    f"rsi={_num(km.get('rsi_14'), '.1f')} | "
+                    f"macd_hist={_num(km.get('macd_histogram'), '.4f')} | "
+                    f"bb_zscore={_num(km.get('bb_zscore'), '.4f')} | "
+                    f"ret5d={_pct(km.get('return_5d'))} | "
+                    f"ret30d={_pct(km.get('return_30d'))} | "
+                    f"ret90d={_pct(km.get('return_90d'))} | "
+                    f"dd30d={_num(km.get('drawdown_30d'), '.2f')}% | "
+                    f"vol_spike={_num(km.get('volume_spike_pct'), '.2f')}% | "
+                    f"vol30d={_num(km.get('realized_vol_30d'), '.2f')} | "
+                    f"vs20dma={_pct(km.get('distance_from_20dma'))}"
+                )
+                lines.append(line)
             except Exception:
-                # best-effort formatting
-                lines.append(f"[{entry.timestamp} {entry.cycle_type}] Decision: {entry.decision} | Rationale: {entry.decision_rationale}")
-        lines.append("--- end journal ---")
+                # Best-effort fallback: just timestamp + cycle, skip if broken
+                lines.append(f"[{entry.timestamp} {entry.cycle_type}] (metrics unavailable)")
+        lines.append("--- end metrics ---")
         return "\n".join(lines)

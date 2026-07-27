@@ -1,31 +1,7 @@
 {
-  "refreshed_at": "2026-07-22T13:35:11.612898+00:00",
+  "refreshed_at": "2026-07-24T13:42:26.713799+00:00",
   "source": "robinhood_mcp_direct",
   "entries": [
-    {
-      "ticker": "GOOGL",
-      "date": "2026-07-22",
-      "time": "AMC",
-      "verified": true,
-      "eps_estimate": "2.870000",
-      "eps_actual": null
-    },
-    {
-      "ticker": "NEM",
-      "date": "2026-07-23",
-      "time": "AMC",
-      "verified": true,
-      "eps_estimate": "2.180000",
-      "eps_actual": null
-    },
-    {
-      "ticker": "MSFT",
-      "date": "2026-07-29",
-      "time": "AMC",
-      "verified": true,
-      "eps_estimate": "4.230000",
-      "eps_actual": null
-    },
     {
       "ticker": "ARM",
       "date": "2026-07-29",
@@ -40,6 +16,14 @@
       "time": "AMC",
       "verified": true,
       "eps_estimate": "7.180000",
+      "eps_actual": null
+    },
+    {
+      "ticker": "MSFT",
+      "date": "2026-07-29",
+      "time": "AMC",
+      "verified": true,
+      "eps_estimate": "4.230000",
       "eps_actual": null
     },
     {
