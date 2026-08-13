@@ -56,8 +56,13 @@ class EarningsCalendar:
         except Exception as exc:
             self.logger.warning("earnings_calendar_refresh_failed: %s", exc)
 
-    def get_upcoming(self, ticker: str, within_days: int = 2) -> dict | None:
-        """Return earnings entry if ticker has earnings within within_days, else None."""
+    def get_upcoming(self, ticker: str, within_days: int = 5, after_days: int = 3) -> dict | None:
+        """Return earnings entry if ticker has earnings within the configured window, else None.
+
+        Window covers `within_days` days BEFORE the report through `after_days`
+        days AFTER the report (inclusive). This makes the earnings_flag true for
+        the full catalyst window, not only the run-up.
+        """
         try:
             cache = json.loads(self.cache_path.read_text(encoding="utf-8"))
             today = datetime.now(timezone.utc).date()
@@ -67,7 +72,9 @@ class EarningsCalendar:
                 try:
                     ev_date = date.fromisoformat(entry["date"])
                     days_away = (ev_date - today).days
-                    if 0 <= days_away <= within_days:
+                    # treat as in-window from `after_days` after the report (negative days_away)
+                    # back through `within_days` before it (positive days_away).
+                    if -after_days <= days_away <= within_days:
                         return {**entry, "days_away": days_away}
                 except (ValueError, KeyError):
                     continue
@@ -75,31 +82,41 @@ class EarningsCalendar:
             pass
         return None
 
+    def is_in_earnings_window(self, ticker: str, within_days: int = 5, after_days: int = 3) -> bool:
+        """Cheap boolean check: is this ticker inside the earnings window right now?
+
+        INFORMATIONAL ONLY — never used as a hard BUY/SELL gate.
+        """
+        return self.get_upcoming(ticker, within_days=within_days, after_days=after_days) is not None
+
+    def earnings_window_for_prompt(self, ticker: str) -> str:
+        """Return a short opportunity-review block when the ticker is in the
+        earnings window. INFORMATIONAL — never a ban. ~80 tokens.
+
+        Returns "" when the ticker is outside the window.
+        """
+        near = self.get_upcoming(ticker, within_days=5, after_days=3)
+        if not near:
+            return ""
+        date_str = near.get("date", "?")
+        time_str = near.get("time", "?")
+        days_away = near.get("days_away", 0)
+        eps_estimate = near.get("eps_estimate")
+        iff_eps = f" EPS est {eps_estimate:.2f}." if eps_estimate else ""
+        if days_away >= 0:
+            head = f"EARNINGS WINDOW: next_earnings={date_str} ({time_str}, {days_away}d away)."
+        else:
+            head = f"EARNINGS WINDOW: reported {date_str} ({abs(days_away)}d ago, {time_str})."
+        return (
+            head + iff_eps + " Evaluate as a dated catalyst, NOT a ban.\n"
+            "- Decide: BUY into / HOLD through if setup + expected move is favorable with edge, OR IGNORE/SELL if risk/reward is poor.\n"
+            "- State in reasoning whether earnings is a positive catalyst, a risk, or neutral.\n"
+            "- Do NOT reject solely because earnings are near."
+        )
+
     def earnings_warning_for_prompt(self, ticker: str) -> str:
-        """Return a warning string to inject into Claude prompt if earnings imminent."""
-        near = self.get_upcoming(ticker, within_days=2)
-        if near:
-            eps_estimate = near.get("eps_estimate")
-            verified = near.get("verified", False)
-            date_str = near.get("date", "?")
-            time_str = near.get("time", "?")
-            eps_str = f"{eps_estimate:.2f}" if eps_estimate else "not yet available"
-            confirmed = "Confirmed date." if verified else "Date not yet confirmed — treat as tentative."
-            return (
-                f"EARNINGS WARNING: {ticker} reports in {near['days_away']} day(s) "
-                f"({date_str}, {time_str}). "
-                f"EPS estimate: {eps_str}. "
-                f"{confirmed} "
-                f"New BUY positions are BLOCKED. Review existing positions carefully."
-            )
-        far = self.get_upcoming(ticker, within_days=5)
-        if far:
-            eps_estimate = far.get("eps_estimate")
-            eps_str = f"{eps_estimate:.2f}" if eps_estimate else "not yet available"
-            return (
-                f"Note: {ticker} earnings in {far['days_away']} day(s) "
-                f"({far.get('date', '?')}, {far.get('time', '?')}). "
-                f"EPS estimate: {eps_str}. "
-                f"Factor into thesis."
-            )
-        return ""
+        """Backward-compatible alias for earnings_window_for_prompt.
+
+        Kept so any legacy call sites still emit the (now informational) block.
+        """
+        return self.earnings_window_for_prompt(ticker)

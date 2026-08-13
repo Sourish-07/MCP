@@ -11,8 +11,8 @@
       "mcp__robinhood-trading__get_popular_watchlists",
       "mcp__robinhood-trading__create_watchlist",
       "mcp__robinhood-trading__update_watchlist",
-      "mcp__robinhood-trading__follow_list",
-      "mcp__robinhood-trading__unfollow_list",
+      "mcp__robinhood-trading__follow_watchlist",
+      "mcp__robinhood-trading__unfollow_watchlist",
       "mcp__robinhood-trading__add_to_watchlist",
       "mcp__robinhood-trading__remove_from_watchlist",
       "mcp__robinhood-trading__add_option_to_watchlist",
@@ -20,7 +20,7 @@
 
       "mcp__robinhood-trading__get_equity_historicals",
       "mcp__robinhood-trading__get_indexes",
-      "mcp__robinhood-trading__get_indexes_quotes",
+      "mcp__robinhood-trading__get_index_quotes",
 
       "mcp__robinhood-trading__get_equity_positions",
       "mcp__robinhood-trading__get_equity_quotes",

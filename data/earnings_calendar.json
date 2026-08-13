@@ -1,38 +1,5 @@
 {
-  "refreshed_at": "2026-07-24T13:42:26.713799+00:00",
+  "refreshed_at": "2026-08-05T13:58:33.128096+00:00",
   "source": "robinhood_mcp_direct",
-  "entries": [
-    {
-      "ticker": "ARM",
-      "date": "2026-07-29",
-      "time": "AMC",
-      "verified": true,
-      "eps_estimate": "0.360000",
-      "eps_actual": null
-    },
-    {
-      "ticker": "META",
-      "date": "2026-07-29",
-      "time": "AMC",
-      "verified": true,
-      "eps_estimate": "7.180000",
-      "eps_actual": null
-    },
-    {
-      "ticker": "MSFT",
-      "date": "2026-07-29",
-      "time": "AMC",
-      "verified": true,
-      "eps_estimate": "4.230000",
-      "eps_actual": null
-    },
-    {
-      "ticker": "AMD",
-      "date": "2026-08-04",
-      "time": "AMC",
-      "verified": true,
-      "eps_estimate": "1.550000",
-      "eps_actual": null
-    }
-  ]
+  "entries": []
 }

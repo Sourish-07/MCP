@@ -15,12 +15,11 @@ from core.position_manager import PositionManager
 class ExecutionEngine:
     """Execution engine with dry-run enforcement and logging."""
 
-    EDGE_THRESHOLD = 3.5
-
     def __init__(self, client: RobinhoodMCPClient, position_manager: PositionManager, settings: dict) -> None:
         self.client = client
         self.position_manager = position_manager
         self.settings = settings
+        self._edge_threshold = float(settings.get("trading", {}).get("edge_score_threshold", 3.0))
         self.logger = logging.getLogger("robinhood-agent.core.execution")
         self._trades_path = Path(__file__).resolve().parent.parent / "logs" / "trades.json"
         self._trades_path.parent.mkdir(exist_ok=True)
@@ -32,6 +31,7 @@ class ExecutionEngine:
         """Map computed edge total into a position size percentage.
 
         Ranges:
+          3.0 <= total < 3.5 -> 3%
           3.5 <= total < 4.0 -> 4%
           4.0 <= total < 4.5 -> 6%
           4.5 <= total       -> 8%
@@ -46,6 +46,8 @@ class ExecutionEngine:
             return 0.06
         if t >= 3.5:
             return 0.04
+        if t >= 3.0:
+            return 0.03
         return 0.0
 
     def _is_safe_execution_window(self) -> bool:
@@ -91,10 +93,10 @@ class ExecutionEngine:
         )
         self.logger.info(
             "EXECUTION_GATECHECK ticker=%s raw_decision=%s edge_total=%.4f threshold=%.1f",
-            decision.ticker, decision.decision.value, edge_total, self.EDGE_THRESHOLD
+            decision.ticker, decision.decision.value, edge_total, self._edge_threshold
         )
 
-        if edge_total < self.EDGE_THRESHOLD:
+        if edge_total < self._edge_threshold:
             result = ExecutionResult(ticker=decision.ticker, status="REJECTED_LOW_EDGE", dry_run=effective_dry_run, timestamp=datetime.now(timezone.utc).isoformat())
             self._log_trade(decision, result, 0.0)
             return result
@@ -148,8 +150,12 @@ class ExecutionEngine:
             # Allow trade in OPEN cycle when data is available but check fails
             self.logger.warning("Proceeding with trade despite tradability check error in OPEN cycle")
 
+        # Capture the open record up-front for SELL so realized PnL can be
+        # recorded before record_exit() drops the ticker.
+        sell_record = None
         if decision.decision == DecisionType.SELL:
-            record = next((r for r in self.position_manager.get_open_records() if r.ticker == decision.ticker), None)
+            sell_record = next((r for r in self.position_manager.get_open_records() if r.ticker == decision.ticker), None)
+            record = sell_record
             quantity = record.quantity if record and record.quantity > 0 else 0.0
             quantity = round(quantity, 6)
             if quantity <= 0:
@@ -221,6 +227,11 @@ class ExecutionEngine:
                 self.position_manager.record_entry(result, decision, realized_vol_30d)
             if decision.decision in (DecisionType.SELL, DecisionType.ROTATE):
                 exit_ticker = decision.rotate_from_ticker if decision.decision == DecisionType.ROTATE else decision.ticker
+                # Record realized PnL before the record is dropped.
+                if sell_record is not None and sell_record.entry_price > 0 and result.fill_price > 0:
+                    self.position_manager.record_realized_pnl(
+                        exit_ticker, sell_record.entry_price, result.fill_price, sell_record.quantity
+                    )
                 self.position_manager.record_exit(exit_ticker)
             return result
 
@@ -233,23 +244,52 @@ class ExecutionEngine:
                 result = ExecutionResult(ticker=decision.ticker, status="REJECTED", dry_run=effective_dry_run, timestamp=datetime.now(timezone.utc).isoformat(), side=side)
                 self._log_trade(decision, result, position_size_pct_local)
                 return result
-            placed = await self.client.place_equity_order(decision.ticker, side, quantity, "market", dry_run=False)
-            result = ExecutionResult(
-                ticker=decision.ticker,
-                order_id=getattr(placed, "order_id", ""),
-                status="EXECUTED" if getattr(placed, "status", "") else "SUBMITTED",
-                fill_price=getattr(placed, "fill_price", current_price),
-                quantity=quantity,
-                timestamp=datetime.now(timezone.utc).isoformat(),
-                dry_run=False,
-                side=side,
+            placed = await self.client.place_equity_order(
+                decision.ticker, side, quantity, "market", dry_run=False
             )
+
+            # placed is now always a proper ExecutionResult after the client fix.
+            # Still keep a safety net in case of unexpected return shapes.
+            if isinstance(placed, ExecutionResult):
+                result = ExecutionResult(
+                    ticker=decision.ticker,
+                    order_id=placed.order_id or "",
+                    status=placed.status or "SUBMITTED",
+                    fill_price=placed.fill_price or current_price,
+                    quantity=placed.quantity or quantity,
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                    dry_run=False,
+                    side=side,
+                )
+            else:
+                result = ExecutionResult(
+                    ticker=decision.ticker,
+                    order_id=getattr(placed, "order_id", "") or "",
+                    status="SUBMITTED",
+                    fill_price=getattr(placed, "fill_price", current_price) or current_price,
+                    quantity=quantity,
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                    dry_run=False,
+                    side=side,
+                )
+
             self._log_trade(decision, result, position_size_pct_local)
-            if result.status == "EXECUTED":
+
+            # Treat both EXECUTED and SUBMITTED as ownership — record the position
+            if result.status in ("EXECUTED", "SUBMITTED"):
                 if decision.decision in (DecisionType.BUY, DecisionType.ROTATE):
                     self.position_manager.record_entry(result, decision, realized_vol_30d)
                 if decision.decision in (DecisionType.SELL, DecisionType.ROTATE):
-                    exit_ticker = decision.rotate_from_ticker if decision.decision == DecisionType.ROTATE else decision.ticker
+                    exit_ticker = (
+                        decision.rotate_from_ticker
+                        if decision.decision == DecisionType.ROTATE
+                        else decision.ticker
+                    )
+                    # Record realized PnL before the record is dropped.
+                    if sell_record is not None and sell_record.entry_price > 0 and result.fill_price > 0:
+                        self.position_manager.record_realized_pnl(
+                            exit_ticker, sell_record.entry_price, result.fill_price, sell_record.quantity
+                        )
                     self.position_manager.record_exit(exit_ticker)
             return result
         except Exception as exc:

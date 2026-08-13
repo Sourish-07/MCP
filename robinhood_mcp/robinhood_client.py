@@ -552,7 +552,22 @@ class RobinhoodMCPClient:
     # ------------------------------------------------------------------ #
 
     async def get_portfolio(self) -> Portfolio:
-        """Fetch the current portfolio as a Portfolio model."""
+        """Fetch the current portfolio as a Portfolio model.
+
+        IMPORTANT: Robinhood's `get_portfolio` tool only returns account-level
+        aggregates (total_value, cash, buying_power, etc.) — it has NEVER
+        included a per-symbol `positions` array (confirmed against real
+        captured responses in logs/direct_mcp_trace.jsonl). The actual
+        per-symbol holdings live behind the separate `get_equity_positions`
+        tool. This method now fetches both and merges them, so
+        `Portfolio.positions` is always the real, live account state
+        instead of silently being an empty list forever.
+
+        A failure fetching positions never breaks the aggregate portfolio
+        fetch — it just leaves `.positions` empty for this call, exactly
+        as before, so existing safety nets (never reconcile against an
+        empty positions list) keep working.
+        """
         account_number = await self._get_account_number()
         args = {"account_number": account_number} if account_number else {}
         content = await self._call_tool_with_retry("get_portfolio", args)
@@ -564,7 +579,14 @@ class RobinhoodMCPClient:
             portfolio_data = parsed if isinstance(parsed, dict) else {}
 
         portfolio_data = self._coerce_portfolio_fields(portfolio_data)
-        return Portfolio.model_validate(portfolio_data)
+        portfolio = Portfolio.model_validate(portfolio_data)
+
+        try:
+            portfolio.positions = await self.get_equity_positions()
+        except Exception as exc:
+            self.logger.warning("get_portfolio_positions_merge_failed: %s", exc)
+
+        return portfolio
 
     async def get_equity_quotes(self, tickers: list[str]) -> list[EquityQuote]:
         """Fetch latest quotes for up to 20 tickers. Not account-scoped."""
@@ -784,7 +806,24 @@ class RobinhoodMCPClient:
             return []
 
     async def get_equity_positions(self) -> list[Position]:
-        """Fetch current open positions as Position models. Account-scoped."""
+        """Fetch current open positions as Position models. Account-scoped.
+
+        THIS IS THE SINGLE PLACE real per-symbol holdings enter the system.
+        `get_portfolio` (above) never carries them — this is a separate tool.
+
+        Field names are mapped defensively (several candidate keys per
+        field, same pattern already proven in get_equity_quotes) because
+        this tool was previously never called end-to-end, so its exact
+        response shape has not been observed live yet. Every call is
+        still captured to logs/direct_mcp_trace.jsonl by
+        _call_tool_with_retry — check that file after the first live run
+        and extend the candidate-key tuples below if a field comes back
+        as 0/empty that shouldn't be.
+
+        A single malformed row never drops the whole list: each item is
+        parsed independently so one bad symbol can't hide every other
+        real position from the caller.
+        """
         account_number = await self._get_account_number()
         args = {"account_number": account_number} if account_number else {}
         content = await self._call_tool_with_retry("get_equity_positions", args)
@@ -796,7 +835,58 @@ class RobinhoodMCPClient:
             items = parsed
         else:
             items = []
-        return [Position.model_validate(item) for item in items]
+
+        def _first(d: dict[str, Any], *keys: str, default: Any = 0) -> Any:
+            for k in keys:
+                if k in d and d[k] not in (None, ""):
+                    return d[k]
+            return default
+
+        def _f(v: Any) -> float:
+            try:
+                return float(v)
+            except (TypeError, ValueError):
+                return 0.0
+
+        positions: list[Position] = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            try:
+                ticker = str(_first(item, "symbol", "ticker", "instrument_symbol", default="")).upper().strip()
+                if not ticker:
+                    self.logger.warning("get_equity_positions_skip_no_ticker item_keys=%s", list(item.keys()))
+                    continue
+                quantity = _f(_first(item, "quantity", "shares", "quantity_available"))
+                avg_cost = _f(_first(item, "average_buy_price", "avg_cost", "average_cost", "cost_basis_per_share"))
+                current_price = _f(_first(item, "current_price", "last_trade_price", "price", "mark_price"))
+                market_value = _f(_first(item, "market_value", "equity", "current_value"))
+                if market_value == 0.0 and current_price > 0 and quantity > 0:
+                    market_value = current_price * quantity
+                unrealized_pct_raw = _first(item, "unrealized_pnl_pct", "percent_change", "total_return_percent", default=None)
+                if unrealized_pct_raw is not None:
+                    unrealized_pnl_pct = _f(unrealized_pct_raw)
+                elif avg_cost > 0 and current_price > 0:
+                    unrealized_pnl_pct = ((current_price - avg_cost) / avg_cost) * 100.0
+                else:
+                    unrealized_pnl_pct = 0.0
+                sector = str(_first(item, "sector", default=""))
+
+                positions.append(Position.model_validate({
+                    "ticker": ticker,
+                    "quantity": quantity,
+                    "avg_cost": avg_cost,
+                    "current_price": current_price,
+                    "market_value": market_value,
+                    "unrealized_pnl_pct": unrealized_pnl_pct,
+                    "sector": sector,
+                }))
+            except Exception as exc:
+                self.logger.warning("get_equity_positions_row_skipped item_keys=%s error=%s", list(item.keys()), exc)
+                continue
+
+        self.logger.info("get_equity_positions_parsed count=%d", len(positions))
+        return positions
 
     async def get_earnings_calendar(self) -> dict[str, Any]:
         """Fetch the upcoming earnings calendar directly from Robinhood's
@@ -955,6 +1045,52 @@ class RobinhoodMCPClient:
         }
         if account_number:
             args["account_number"] = account_number
+
         content = await self._call_tool_with_retry("place_equity_order", args)
         parsed = self._extract_json_payload(content)
-        return ExecutionResult.model_validate(parsed if isinstance(parsed, dict) else {})
+
+        # Defensive extraction — MCP returns nested shapes that do not
+        # match ExecutionResult fields directly.
+        data = parsed.get("data", parsed) if isinstance(parsed, dict) else {}
+        order = data.get("order", data) if isinstance(data, dict) else {}
+
+        order_id = (
+            order.get("id")
+            or order.get("order_id")
+            or data.get("id")
+            or data.get("order_id")
+            or ""
+        )
+        fill_price = float(
+            order.get("average_price")
+            or order.get("price")
+            or order.get("filled_price")
+            or data.get("average_price")
+            or data.get("price")
+            or 0.0
+        )
+        status_raw = str(
+            order.get("state")
+            or order.get("status")
+            or data.get("state")
+            or data.get("status")
+            or "SUBMITTED"
+        ).upper()
+
+        if status_raw in ("FILLED", "COMPLETED", "EXECUTED"):
+            status = "EXECUTED"
+        elif status_raw in ("QUEUED", "CONFIRMED", "UNCONFIRMED", "SUBMITTED", ""):
+            status = "SUBMITTED"
+        else:
+            status = status_raw or "SUBMITTED"
+
+        return ExecutionResult(
+            ticker=ticker,                    # always inject — never trust the payload
+            order_id=str(order_id),
+            status=status,
+            fill_price=fill_price,
+            quantity=quantity,
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            dry_run=False,
+            side=side,
+        )

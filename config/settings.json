@@ -1,12 +1,12 @@
 {
   "models": {
-    "decision": "claude-sonnet-4-5",
+    "decision": "claude-sonnet-5",
     "cheap": "claude-haiku-4-5"
   },
   "trading": {
     "max_positions": 12,
     "max_position_pct": 0.08,
-    "edge_score_threshold": 3.5,
+    "edge_score_threshold": 3.0,
     "stop_loss_pct": -0.07,
     "profit_review_pct": 0.15,
     "max_holding_days": 15,
@@ -24,21 +24,41 @@
   },
   "watchlist": {
     "default_tickers": [
-      "NEM",
+      "JPM",
       "NVDA",
       "AVGO",
-      "GOOGL",
+      "CAT",
       "MU",
       "TSM",
-      "META",
-      "MSFT",
+      "UNH",
+      "XOM",
       "AMD",
-      "ARM"
+      "COST"
     ],
     "robinhood_watchlist_name": "Default"
   },
   "cost_limits": {
     "daily_usd_limit": 3.00,
     "monthly_usd_limit": 50.00
+  },
+  "news": {
+    "provider": "finnhub",
+    "lookback_days": 3,
+    "max_per_ticker": 5,
+    "fresh_window_hours": 24,
+    "general_market": {
+      "enabled": true,
+      "category": "general",
+      "count": 8
+    },
+    "haiku_summary": {
+      "enabled": false,
+      "fetch_cap": 20,
+      "max_summary_sentences": 5
+    },
+    "haiku_fallback": {
+      "enabled": false,
+      "trigger_when_no_news": true
+    }
   }
 }

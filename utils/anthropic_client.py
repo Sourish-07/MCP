@@ -12,7 +12,7 @@ from utils.cost_tracker import CostTracker
 class AnthropicClient:
     """Async Anthropic client wrapper with retry and cost tracking."""
 
-    def __init__(self, model: str, max_tokens: int = 2000, temperature: float = 0.1) -> None:
+    def __init__(self, model: str, max_tokens: int = 4096, temperature: float = 0.1) -> None:
         self.model = model
         self.max_tokens = max_tokens
         self.temperature = temperature
