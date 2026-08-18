@@ -4,7 +4,7 @@ import asyncio
 import json
 import logging
 import os
-from datetime import datetime, timezone, time
+from datetime import datetime, timezone, time, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -90,6 +90,13 @@ _MONITOR_SYSTEM_PROMPT = [
 ]
 
 
+# Per-ticker cooldowns for SOFT monitor signals so a stuck >=15% / >=20% gain
+# does not re-query the LLM every 60 seconds after a HOLD. STOP_LOSS is a hard
+# risk rule and is NEVER throttled.
+MONITOR_SOFT_COOLDOWN = timedelta(minutes=15)   # PROFIT_REVIEW
+MONITOR_TARGET_COOLDOWN = timedelta(minutes=5)  # PROFIT_TARGET (closer to exit)
+
+
 class TradingAgent:
     """Anthropic-only trading agent orchestrating ingest, metrics, news, decisions,
     and execution.  Provides a three-cycle schedule plus a 60-second price monitor
@@ -127,6 +134,10 @@ class TradingAgent:
         self._monitor_locks: dict[str, asyncio.Lock] = {}
         self._monitor_cache: dict[str, tuple[float, MarketMetrics, list[str]]] = {}
         self._exit_in_progress: set[str] = set()
+        # Per-ticker last soft-signal evaluation timestamp (UTC). Used to
+        # throttle PROFIT_REVIEW / PROFIT_TARGET after a HOLD so the LLM is
+        # not re-queried every tick. STOP_LOSS ignores this entirely.
+        self._last_monitor_review: dict[str, datetime] = {}
 
     # ==================================================================
     #  CONFIG
@@ -478,6 +489,28 @@ class TradingAgent:
             if ticker in self._exit_in_progress:
                 self.logger.debug("monitor_skip_locked ticker=%s", ticker)
                 continue
+
+            # ---- Soft-signal cooldown (PROFIT_REVIEW / PROFIT_TARGET) ----
+            # STOP_LOSS is a hard risk rule: never skipped for cooldown.
+            # Combined soft reasons (e.g. "PROFIT_REVIEW+MAX_HOLDING_PERIOD")
+            # are treated as soft and use MONITOR_SOFT_COOLDOWN.
+            if signal.reason != "STOP_LOSS":
+                now_utc = datetime.now(timezone.utc)
+                if "PROFIT_TARGET" in signal.reason:
+                    cooldown = MONITOR_TARGET_COOLDOWN
+                else:
+                    # PROFIT_REVIEW and any soft combined form fall back to the
+                    # longer cooldown.
+                    cooldown = MONITOR_SOFT_COOLDOWN
+                last = self._last_monitor_review.get(ticker)
+                if last is not None and (now_utc - last) < cooldown:
+                    remaining = (cooldown - (now_utc - last)).total_seconds()
+                    self.logger.info(
+                        "monitor_skip_cooldown ticker=%s reason=%s remaining_s=%.0f",
+                        ticker, signal.reason, remaining,
+                    )
+                    continue
+
             self._exit_in_progress.add(ticker)
 
             try:
@@ -499,6 +532,14 @@ class TradingAgent:
                         spy_context="",
                         open_positions_pnl=pnl_map,
                     )
+
+                    # Stamp the soft-signal evaluation timestamp AFTER the
+                    # model returns (HOLD or SELL, and also on the fallback
+                    # HOLD path inside _evaluate_threshold_signal) so a failed
+                    # call does not immediately retry every tick. STOP_LOSS
+                    # is intentionally never stamped.
+                    if signal.reason != "STOP_LOSS":
+                        self._last_monitor_review[ticker] = datetime.now(timezone.utc)
 
                     # Journal the monitor decision with consistent fill/unrealized/earnings fields
                     try:
@@ -531,6 +572,9 @@ class TradingAgent:
                         # EXECUTED / SUBMITTED / WOULD_EXECUTE (dry-run). Do NOT call record_exit again.
                         if result.status in ("EXECUTED", "SUBMITTED", "WOULD_EXECUTE"):
                             pnl_map.pop(ticker, None)
+                            # Position is closed: clear cooldown timestamp so a
+                            # future re-entry starts clean (no stale throttle).
+                            self._last_monitor_review.pop(ticker, None)
                             try:
                                 self.position_manager.write_performance_snapshot(quotes_map)
                             except Exception:
