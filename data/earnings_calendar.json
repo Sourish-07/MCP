@@ -1,5 +1,14 @@
 {
-  "refreshed_at": "2026-08-05T13:58:33.128096+00:00",
+  "refreshed_at": "2026-08-17T13:35:10.203740+00:00",
   "source": "robinhood_mcp_direct",
-  "entries": []
+  "entries": [
+    {
+      "ticker": "NVDA",
+      "date": "2026-08-26",
+      "time": "AMC",
+      "verified": true,
+      "eps_estimate": "2.070000",
+      "eps_actual": null
+    }
+  ]
 }
