@@ -1,5 +1,5 @@
 {
-  "refreshed_at": "2026-08-17T13:35:10.203740+00:00",
+  "refreshed_at": "2026-08-20T13:38:12.258739+00:00",
   "source": "robinhood_mcp_direct",
   "entries": [
     {
@@ -8,6 +8,14 @@
       "time": "AMC",
       "verified": true,
       "eps_estimate": "2.070000",
+      "eps_actual": null
+    },
+    {
+      "ticker": "AVGO",
+      "date": "2026-09-02",
+      "time": "AMC",
+      "verified": true,
+      "eps_estimate": "3.160000",
       "eps_actual": null
     }
   ]
