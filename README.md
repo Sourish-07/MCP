@@ -432,6 +432,33 @@ Unknown models default to Sonnet pricing. `record()` computes cost from regular 
 
 ---
 
+## Weekly sentiment ticker selection (feature-flagged)
+
+Set `sentiment_selection.enabled: true` in `config/settings.json` to let a
+weekly scheduled job (Sunday evening ET) re-rank the trading universe using
+Finnhub headlines scored by a ModernBERT financial sentiment model
+(`core/weekly_selector.py`, `core/weekly_news.py`, `core/sentiment_model.py`,
+`core/ticker_selector.py`). When the flag is off, the agent keeps using
+`watchlist.default_tickers` and no weekly job is registered.
+
+Guarantees: currently held tickers are NEVER dropped (even when holdings
+outnumber `universe_size`), ticker scores are the mean of their headline
+scores, and any pipeline failure keeps the previous week's universe.
+
+Runtime artifacts `data/selected_universe.json` and
+`data/weekly_news_cache.json` are git-ignored state files.
+
+Verification harness (offline-deterministic; does a live Finnhub fetch only
+when `FINNHUB_API_KEY` is set):
+
+```
+pytest tests/ -q
+python scripts/verify_weekly_layer.py
+```
+
+
+---
+
 ## Important Warning
 
 **This project is for research, experimentation, and education. Trading involves real financial risk, and this is genuinely autonomous money-moving software.** It places/simulates orders against a real brokerage account based on LLM judgment, and while risk rules are enforced in code, LLM output is non-deterministic and markets are unpredictable.

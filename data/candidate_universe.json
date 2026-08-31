@@ -1,0 +1,16 @@
+{
+  "description": "Candidate universe for weekly sentiment-based ticker selection. Large, liquid US equities (S&P 100 style). Edit freely - protected holdings are always kept regardless of this list.",
+  "updated": "2026-08-31",
+  "tickers": [
+    "AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA", "AVGO",
+    "JPM", "V", "UNH", "XOM", "MA", "JNJ", "WMT", "PG",
+    "HD", "COST", "BAC", "AMD", "NFLX", "ADBE", "CRM", "INTC",
+    "MU", "TSM", "CAT", "BA", "GS", "MS", "MCD", "NKE",
+    "SBUX", "QCOM", "TXN", "HON", "IBM", "ORCL", "DIS", "PYPL",
+    "GE", "LULU", "SPGI", "PLD", "AMT", "CCI", "EQIX", "CSCO",
+    "PEP", "KO", "MRK", "PFE", "ABT", "TMO", "DHR", "LLY",
+    "NEE", "SO", "DUK", "AEP", "SRE", "XEL", "WEC", "ES",
+    "F", "GM", "C", "WFC", "USB", "PNC", "TFC", "BK",
+    "AXP", "COF", "SCHW", "BLK", "CB", "MMC", "AON", "ICE"
+  ]
+}

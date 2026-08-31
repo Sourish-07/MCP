@@ -60,5 +60,19 @@
       "enabled": false,
       "trigger_when_no_news": true
     }
+  },
+  "sentiment_selection": {
+    "enabled": true,
+    "universe_size": 10,
+    "lookback_days": 7,
+    "min_sentiment_score": -1.0,
+    "schedule_day": "sun",
+    "schedule_hour": 20,
+    "schedule_minute": 0,
+    "schedule_timezone": "America/New_York",
+    "model_name": "AnkitAI/FinSense-ModernBERT-Financial-News-Sentiment-Analysis",
+    "fallback_model": "AnkitAI/distilbert-base-uncased-financial-news-sentiment-analysis",
+    "batch_size": 16,
+    "cache_max_age_hours": 24
   }
 }

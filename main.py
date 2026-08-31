@@ -28,6 +28,7 @@ from utils.journal_manager import JournalManager
 from utils.earnings_calendar import EarningsCalendar
 from utils.anthropic_client import AnthropicClient
 from utils.cost_tracker import CostLimitExceededError, CostTracker
+from core.weekly_selector import WeeklySelector, get_weekly_selector
 from utils.logger import configure_logging
 
 
@@ -130,6 +131,9 @@ class TradingAgent:
         self._cached_watchlist: list[str] = []
         self._cached_watchlist_date: str = ""
 
+        # Weekly sentiment selector (lazy-loaded on first use)
+        self._weekly_selector: WeeklySelector | None = None
+
         # ---- 1-minute price monitor state (sections 3 / 5 / 6) ----
         self._monitor_locks: dict[str, asyncio.Lock] = {}
         self._monitor_cache: dict[str, tuple[float, MarketMetrics, list[str]]] = {}
@@ -156,7 +160,26 @@ class TradingAgent:
         }
         return settings
 
+    async def _get_weekly_selector(self) -> WeeklySelector:
+        """Lazy initialization of weekly selector."""
+        if self._weekly_selector is None:
+            self._weekly_selector = await get_weekly_selector(self.config)
+        return self._weekly_selector
+
     async def _resolve_watchlist(self) -> list[str]:
+        """Resolve the trading watchlist, preferring the sentiment-selected universe."""
+        # Prefer the weekly sentiment-selected universe when enabled
+        try:
+            selector = await self._get_weekly_selector()
+            if selector.enabled:
+                selected = selector.get_selected_universe()
+                if selected:
+                    self.logger.info("watchlist_source=weekly_selector count=%d", len(selected))
+                    return selected
+        except Exception as exc:
+            self.logger.warning("weekly_selector unavailable, falling back to config: %s", exc)
+
+        # Fallback: Robinhood MCP watchlist
         watchlist_name = self.config.get("watchlist", {}).get("robinhood_watchlist_name", "Default")
         live_tickers = await self.mcp_client.get_watchlist_tickers(watchlist_name)
         if live_tickers:
@@ -974,6 +997,24 @@ class TradingAgent:
             timezone=tz_name,
             max_instances=1, coalesce=True,
         )
+        # --- Weekly sentiment ticker selection job (feature-flagged) ---
+        try:
+            selector = await self._get_weekly_selector()
+            if selector.enabled:
+                selector.start_scheduler(self.scheduler)
+                self.logger.info("weekly_scheduler_registered")
+                # Bootstrap: run once on startup if no previous selection exists
+                if not selector.get_selected_universe():
+                    self.logger.info("weekly_selection bootstrap: no previous selection, running now")
+                    try:
+                        await selector.run_now()
+                    except Exception as sel_exc:
+                        self.logger.error(
+                            "weekly selection bootstrap failed, using config watchlist: %s", sel_exc
+                        )
+        except Exception as exc:
+            self.logger.error("weekly_scheduler_setup_failed: %s", exc)
+
         self.scheduler.start()
 
         # --- Reconcile at agent start ---
